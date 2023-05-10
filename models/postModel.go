@@ -9,3 +9,11 @@ type User struct {
 	Email    string
 	Password string
 }
+
+type UserEntry struct {
+	gorm.Model
+	UserID  int
+	Title   string
+	Content string
+	User    User `gorm:"foreignKey:UserID"`
+}

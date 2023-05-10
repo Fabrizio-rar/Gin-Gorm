@@ -3,6 +3,7 @@ package main
 import (
 	"Gin-test/initializers"
 	"Gin-test/models"
+	"fmt"
 )
 
 func init() {
@@ -11,5 +12,9 @@ func init() {
 }
 
 func main() {
-	initializers.DB.AutoMigrate(&models.User{})
+	initializers.DB.AutoMigrate(
+		&models.User{},
+		&models.UserEntry{},
+	)
+	fmt.Printf("Api started")
 }

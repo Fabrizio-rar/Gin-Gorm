@@ -3,19 +3,33 @@ package controllers
 import (
 	"Gin-test/initializers"
 	"Gin-test/models"
-	"Gin-test/structs"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreateUser(c *gin.Context) {
-	var body structs.User
-
+	var body models.User
 	c.Bind(&body)
 
-	user := models.User{Name: body.Name, Gender: body.Name, Email: body.Email, Password: body.Password}
+	user := models.User{Name: body.Name, Gender: body.Gender, Email: body.Email, Password: body.Password}
 
 	result := initializers.DB.Create(&user)
+
+	if result.Error != nil {
+		c.Status(400)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user": user,
+	})
+}
+
+func GetUser(c *gin.Context) {
+	userID := c.Param("id")
+	var user models.User
+
+	result := initializers.DB.Find(&user, userID)
 
 	if result.Error != nil {
 		c.Status(400)
@@ -39,4 +53,17 @@ func GetAllUsers(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"users": users,
 	})
+}
+
+func DeleteUser(c *gin.Context) {
+	userID := c.Param("id")
+
+	result := initializers.DB.Delete(&models.User{}, userID)
+
+	if result.Error != nil {
+		c.Status(400)
+		return
+	}
+
+	c.JSON(200, "User deleted succesfully")
 }
