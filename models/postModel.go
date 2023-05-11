@@ -4,16 +4,18 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Name     string
-	Gender   string
-	Email    string
-	Password string
+	ID       uint   `gorm:"primaryKey"`
+	Name     string `gorm:"not null"`
+	Gender   string `gorm:"not null"`
+	Email    string `gorm:"unique;not null"`
+	Password string `gorm:"not null"`
 }
 
 type UserEntry struct {
 	gorm.Model
-	UserID  int
-	Title   string
+	ID      uint   `gorm:"primaryKey"`
+	Email   string `gorm:"not null"`
+	Title   string `gorm:"not null"`
 	Content string
-	User    User `gorm:"foreignKey:UserID"`
+	User    User `gorm:"foreignKey:Email"`
 }
