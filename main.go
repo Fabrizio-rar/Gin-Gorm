@@ -24,6 +24,7 @@ func main() {
 	r.GET("/get_entry", controllers.GetEntry)
 	r.GET("/get_user_entries", controllers.GetAllEntriesFromUser)
 	r.POST("/delete_entry", controllers.DeleteEntry)
+	r.POST("/update_entry", controllers.UpdateEntry)
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
