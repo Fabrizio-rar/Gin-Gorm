@@ -1,3 +1,26 @@
+# Gin-Gorm API Template
+
+This repository contains a RESTful API implementation using the Gin web framework, Gorm as the Object-Relational Mapping (ORM) library, and PostgreSQL as the underlying database.
+
+The API serves as a foundation for building web applications and services with robust routing, database connectivity, and query management. It provides a structured architecture to handle HTTP requests, perform CRUD (Create, Read, Update, Delete) operations on the database, and return appropriate responses.
+
+## Getting started
+
+#### Clone the repository
+
+```bash
+git clone https://github.com/Fabrizio-rar/Gin-Gorm.git
+```
+
+#### Set up your work environment
+
+- Ensure you have Go installed in your machine, for more information access https://go.dev/
+- Create your .env file using the provided example, add the desired port in which the application will run and the URI for the PostgreSQL database
+
+#### Run the application
+
+Run the run.sh script to start the application
+
 
 ## API Reference
 
