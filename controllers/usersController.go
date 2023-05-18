@@ -3,25 +3,23 @@ package controllers
 import (
 	"Gin-test/initializers"
 	"Gin-test/models"
-	"Gin-test/structs"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func CreateUser(c *gin.Context) {
-	var body models.User
-	c.Bind(&body)
-
+	var requestBody models.User
+	c.Bind(&requestBody)
 	var existingUser models.User
 
-	exists := initializers.DB.Where("email = ?", body.Email).First(&existingUser)
+	userExists := initializers.DB.Where("email = ?", requestBody.Email).First(&existingUser)
 
-	if exists.Error == gorm.ErrRecordNotFound {
-		user := models.User{Name: body.Name, Gender: body.Gender, Email: body.Email, Password: body.Password}
-		result := initializers.DB.Create(&user)
+	if userExists.Error == gorm.ErrRecordNotFound {
+		user := models.User{Name: requestBody.Name, Gender: requestBody.Gender, Email: requestBody.Email, Password: requestBody.Password}
+		createResult := initializers.DB.Create(&user)
 
-		if result.Error != nil {
+		if createResult.Error != nil {
 			c.Status(400)
 			return
 		}
@@ -38,18 +36,17 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetUser(c *gin.Context) {
-	var emailParam structs.EmailReq
-	c.BindJSON(&emailParam)
+	userEmail := c.Param("email")
 	var user models.User
 
-	result := initializers.DB.Where("email = ?", emailParam.Email).Find(&user)
+	findResult := initializers.DB.Where("email = ?", userEmail).Find(&user)
 
-	if result.RowsAffected == 0 {
+	if findResult.RowsAffected == 0 {
 		c.JSON(400, "User does not exist")
 		return
 	}
 
-	if result.Error != nil {
+	if findResult.Error != nil {
 		c.Status(400)
 		return
 	}
@@ -61,9 +58,9 @@ func GetUser(c *gin.Context) {
 
 func GetAllUsers(c *gin.Context) {
 	var users []models.User
-	result := initializers.DB.Find(&users)
+	findResult := initializers.DB.Find(&users)
 
-	if result.Error != nil {
+	if findResult.Error != nil {
 		c.Status(400)
 		return
 	}
@@ -74,10 +71,9 @@ func GetAllUsers(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	var emailParam structs.EmailReq
-	c.BindJSON(&emailParam)
+	userEmail := c.Param("email")
 
-	userResult := initializers.DB.Where("email = ?", emailParam.Email).Delete(&models.User{})
+	userResult := initializers.DB.Where("email = ?", userEmail).Delete(&models.User{})
 
 	if userResult.RowsAffected == 0 {
 		c.JSON(400, "User does not exist")
@@ -89,7 +85,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	entriesResult := initializers.DB.Where("email = ?", emailParam.Email).Delete(&models.UserEntry{})
+	entriesResult := initializers.DB.Where("email = ?", userEmail).Delete(&models.UserEntry{})
 
 	if entriesResult.Error != nil {
 		c.Status(400)

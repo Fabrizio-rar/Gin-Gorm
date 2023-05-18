@@ -13,3 +13,8 @@ type UpdateEntryReq struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
+
+type EmailAndTitleReq struct {
+	Email string `json:"email"`
+	Title string `json:"title"`
+}

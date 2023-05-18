@@ -19,13 +19,13 @@ func CreateEntry(c *gin.Context) {
 
 	var existingEntry models.UserEntry
 
-	exists := initializers.DB.Where("title = ? AND email = ?", body.Title, body.Email).First(&existingEntry)
+	entryExists := initializers.DB.Where("title = ? AND email = ?", body.Title, body.Email).First(&existingEntry)
 
-	if exists.Error == gorm.ErrRecordNotFound {
+	if entryExists.Error == gorm.ErrRecordNotFound {
 		userEntry := models.UserEntry{Title: body.Title, Content: body.Content, Email: body.Email}
-		result := initializers.DB.Create(&userEntry)
+		createResult := initializers.DB.Create(&userEntry)
 
-		if result.Error != nil {
+		if createResult.Error != nil {
 			c.Status(400)
 			return
 		}
@@ -42,18 +42,18 @@ func CreateEntry(c *gin.Context) {
 }
 
 func GetEntry(c *gin.Context) {
-	var titleParam structs.TitleReq
-	c.BindJSON(&titleParam)
+	entryTitle := c.Query("title")
+	entryEmail := c.Query("email")
 	var userEntry models.UserEntry
 
-	result := initializers.DB.Where("title = ?", titleParam.Title).Find(&userEntry)
+	findResult := initializers.DB.Where("title = ? AND email = ?", entryTitle, entryEmail).Find(&userEntry)
 
-	if result.RowsAffected == 0 {
+	if findResult.RowsAffected == 0 {
 		c.JSON(400, "Entry does not exist")
 		return
 	}
 
-	if result.Error != nil {
+	if findResult.Error != nil {
 		c.Status(400)
 		return
 	}
@@ -64,14 +64,12 @@ func GetEntry(c *gin.Context) {
 }
 
 func GetAllEntriesFromUser(c *gin.Context) {
-	var emailParam structs.EmailReq
-	c.BindJSON(&emailParam)
-
+	entryEmail := c.Param("email")
 	var userEntries []models.UserEntry
 
-	result := initializers.DB.Where("email = ?", emailParam.Email).Find(&userEntries)
+	findResult := initializers.DB.Where("email = ?", entryEmail).Find(&userEntries)
 
-	if result.Error != nil {
+	if findResult.Error != nil {
 		c.Status(400)
 		return
 	}
@@ -85,14 +83,14 @@ func UpdateEntry(c *gin.Context) {
 	var updateEntryReq structs.UpdateEntryReq
 	c.BindJSON(&updateEntryReq)
 
-	result := initializers.DB.Exec("UPDATE user_entries SET content = ? WHERE email = ? AND title = ?", updateEntryReq.Content, updateEntryReq.Email, updateEntryReq.Title)
+	updateResult := initializers.DB.Exec("UPDATE user_entries SET content = ? WHERE email = ? AND title = ?", updateEntryReq.Content, updateEntryReq.Email, updateEntryReq.Title)
 
-	if result.RowsAffected == 0 {
+	if updateResult.RowsAffected == 0 {
 		c.JSON(400, "Entry does not exist")
 		return
 	}
 
-	if result.Error != nil {
+	if updateResult.Error != nil {
 		c.JSON(400, "Error updating the entry")
 		return
 	}
@@ -111,16 +109,16 @@ func UpdateEntry(c *gin.Context) {
 }
 
 func DeleteEntry(c *gin.Context) {
-	var titleParam structs.TitleReq
-	c.BindJSON(&titleParam)
+	entryTitle := c.Query("title")
+	entryEmail := c.Query("email")
 
-	result := initializers.DB.Where("title = ?", titleParam.Title).Delete(&models.UserEntry{})
+	deleteResult := initializers.DB.Where("title = ? AND email = ?", entryTitle, entryEmail).Delete(&models.UserEntry{})
 
-	if result.RowsAffected == 0 {
+	if deleteResult.RowsAffected == 0 {
 		c.JSON(400, "Entry does not exist")
 	}
 
-	if result.Error != nil {
+	if deleteResult.Error != nil {
 		c.Status(400)
 		return
 	}
