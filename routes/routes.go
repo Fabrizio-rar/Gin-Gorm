@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"Gin-test/controllers"
+	"Gin-gorm/handlers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,16 +9,16 @@ import (
 func InitRoutes() {
 	router := gin.Default()
 
-	router.POST("/create_user", controllers.CreateUser)
-	router.GET("/get_all_users", controllers.GetAllUsers)
-	router.GET("/get_user/:email", controllers.GetUser)
-	router.POST("/delete_user/:email", controllers.DeleteUser)
+	router.POST("/create_user", handlers.CreateUserHandler)
+	router.GET("/get_all_users", handlers.GetAllUsersHandler)
+	router.GET("/get_user/:email", handlers.GetUserHandler)
+	router.POST("/delete_user", handlers.DeleteUserHandler)
 
-	router.POST("/create_entry", controllers.CreateEntry)
-	router.GET("/get_entry", controllers.GetEntry)
-	router.GET("/get_user_entries/:email", controllers.GetAllEntriesFromUser)
-	router.POST("/delete_entry", controllers.DeleteEntry)
-	router.POST("/update_entry", controllers.UpdateEntry)
+	router.POST("/create_entry", handlers.CreateEntryHandler)
+	router.GET("/get_entry", handlers.GetEntryHandler)
+	router.GET("/get_user_entries/:email", handlers.GetAllEntriesFromUserHandler)
+	router.POST("/delete_entry", handlers.DeleteEntryHandler)
+	router.POST("/update_entry", handlers.UpdateEntryHandler)
 
 	router.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

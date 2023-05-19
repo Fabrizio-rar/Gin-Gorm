@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Gin-test/initializers"
-	"Gin-test/models"
+	"Gin-gorm/initializers"
+	"Gin-gorm/models"
 )
 
 func init() {

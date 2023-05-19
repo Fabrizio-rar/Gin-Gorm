@@ -1,15 +1,15 @@
-package controllers
+package handlers
 
 import (
-	"Gin-test/initializers"
-	"Gin-test/models"
-	"Gin-test/structs"
+	"Gin-gorm/initializers"
+	"Gin-gorm/models"
+	"Gin-gorm/services"
+	"Gin-gorm/structs"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func CreateEntry(c *gin.Context) {
+func CreateEntryHandler(c *gin.Context) {
 	var body models.UserEntry
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -17,61 +17,36 @@ func CreateEntry(c *gin.Context) {
 		return
 	}
 
-	var existingEntry models.UserEntry
-
-	entryExists := initializers.DB.Where("title = ? AND email = ?", body.Title, body.Email).First(&existingEntry)
-
-	if entryExists.Error == gorm.ErrRecordNotFound {
-		userEntry := models.UserEntry{Title: body.Title, Content: body.Content, Email: body.Email}
-		createResult := initializers.DB.Create(&userEntry)
-
-		if createResult.Error != nil {
-			c.Status(400)
-			return
-		}
-
-		c.JSON(200, gin.H{
-			"message": "Entry created successfully",
+	err = services.CreateEntry(body.Email, body.Title, body.Content)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
 		})
-		return
 	}
 
-	c.JSON(400, gin.H{
-		"message": "Entry with same title already exists",
-	})
+	c.JSON(200, "Entry created successfully")
 }
 
-func GetEntry(c *gin.Context) {
+func GetEntryHandler(c *gin.Context) {
 	entryTitle := c.Query("title")
 	entryEmail := c.Query("email")
-	var userEntry models.UserEntry
 
-	findResult := initializers.DB.Where("title = ? AND email = ?", entryTitle, entryEmail).Find(&userEntry)
-
-	if findResult.RowsAffected == 0 {
-		c.JSON(400, "Entry does not exist")
-		return
-	}
-
-	if findResult.Error != nil {
+	entry, err := services.GetEntry(entryEmail, entryTitle)
+	if err != nil {
 		c.Status(400)
-		return
 	}
 
 	c.JSON(200, gin.H{
-		"user_entry": userEntry,
+		"entry": entry,
 	})
 }
 
-func GetAllEntriesFromUser(c *gin.Context) {
+func GetAllEntriesFromUserHandler(c *gin.Context) {
 	entryEmail := c.Param("email")
-	var userEntries []models.UserEntry
 
-	findResult := initializers.DB.Where("email = ?", entryEmail).Find(&userEntries)
-
-	if findResult.Error != nil {
+	userEntries, err := services.GetAllEntriesFromUser(entryEmail)
+	if err != nil {
 		c.Status(400)
-		return
 	}
 
 	c.JSON(200, gin.H{
@@ -79,7 +54,7 @@ func GetAllEntriesFromUser(c *gin.Context) {
 	})
 }
 
-func UpdateEntry(c *gin.Context) {
+func UpdateEntryHandler(c *gin.Context) {
 	var updateEntryReq structs.UpdateEntryReq
 	c.BindJSON(&updateEntryReq)
 
@@ -108,7 +83,7 @@ func UpdateEntry(c *gin.Context) {
 	})
 }
 
-func DeleteEntry(c *gin.Context) {
+func DeleteEntryHandler(c *gin.Context) {
 	entryTitle := c.Query("title")
 	entryEmail := c.Query("email")
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Gin-test/initializers"
-	"Gin-test/routes"
+	"Gin-gorm/initializers"
+	"Gin-gorm/routes"
 )
 
 func init() {
