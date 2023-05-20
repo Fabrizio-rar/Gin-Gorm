@@ -11,6 +11,11 @@ type GetUserResp struct {
 	Email  string `json:"email"`
 }
 
+type GetEntryResp struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 type UpdateEntryReq struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

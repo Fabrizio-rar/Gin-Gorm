@@ -9,11 +9,12 @@ import (
 )
 
 func EntryExists(email, title string) (exists bool, err error) {
-	result := initializers.DB.Where("email = ? AND title = ?", email).First(&models.UserEntry{})
+	result := initializers.DB.Where("email = ? AND title = ?", email, title).First(&models.UserEntry{})
 	err = result.Error
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			err = nil
 			exists = false
 			return
 		}
@@ -63,5 +64,11 @@ func DeleteEntry(email, title string) (err error) {
 	if result.RowsAffected == 0 {
 		err = fmt.Errorf("entry does not exist")
 	}
+	return
+}
+
+func DeleteAllEntriesFromUser(email string) (err error) {
+	result := initializers.DB.Where("email = ?", email).Delete(&models.UserEntry{})
+	err = result.Error
 	return
 }

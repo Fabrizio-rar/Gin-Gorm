@@ -21,7 +21,13 @@ func CreateUser(email, password, name, gender string) (err error) {
 		return
 	}
 
-	newUser := models.User{Name: name, Gender: gender, Email: email, Password: password}
+	hashedPassword, err := utils.HashPassword(password)
+	if err != nil {
+		fmt.Println("Error in HashPassword:", err.Error())
+		return
+	}
+
+	newUser := models.User{Name: name, Gender: gender, Email: email, Password: hashedPassword}
 	err = db.CreateUser(newUser)
 	if err != nil {
 		fmt.Println("Error in CreateUser:", err.Error())
@@ -40,10 +46,18 @@ func GetUser(email string) (user models.User, err error) {
 }
 
 func GetAllUsers() (users []structs.GetUserResp, err error) {
-	users, err = db.GetAllUsers()
+	usersModels, err := db.GetAllUsers()
 	if err != nil {
 		fmt.Println("Error in GetAllUsers:", err.Error())
 		return
+	}
+
+	for i := range usersModels {
+		var user structs.GetUserResp
+		user.Email = usersModels[i].Email
+		user.Gender = usersModels[i].Gender
+		user.Name = usersModels[i].Name
+		users = append(users, user)
 	}
 	return
 }
@@ -61,6 +75,11 @@ func DeleteUser(email, password string) (err error) {
 		err = db.DeleteUser(email)
 		if err != nil {
 			fmt.Println("Error in DeleteUser:", err.Error())
+			return
+		}
+		err = db.DeleteAllEntriesFromUser(email)
+		if err != nil {
+			fmt.Println("Error in DeleteAllEntriesFromUser:", err.Error())
 			return
 		}
 	} else {

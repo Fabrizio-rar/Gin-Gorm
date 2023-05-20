@@ -22,6 +22,7 @@ func CreateUserHandler(c *gin.Context) {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(200, "User created successfully")
@@ -32,7 +33,10 @@ func GetUserHandler(c *gin.Context) {
 
 	user, err := services.GetUser(userEmail)
 	if err != nil {
-		c.Status(400)
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	c.JSON(200, gin.H{
@@ -47,7 +51,9 @@ func GetUserHandler(c *gin.Context) {
 func GetAllUsersHandler(c *gin.Context) {
 	users, err := services.GetAllUsers()
 	if err != nil {
-		c.Status(400)
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -62,7 +68,9 @@ func DeleteUserHandler(c *gin.Context) {
 
 	err := services.DeleteUser(emailAndPassword.Email, emailAndPassword.Password)
 	if err != nil {
-		c.Status(400)
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 

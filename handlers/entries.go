@@ -33,7 +33,9 @@ func GetEntryHandler(c *gin.Context) {
 
 	entry, err := services.GetEntry(entryEmail, entryTitle)
 	if err != nil {
-		c.Status(400)
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -47,7 +49,9 @@ func GetAllEntriesFromUserHandler(c *gin.Context) {
 
 	userEntries, err := services.GetAllEntriesFromUser(entryEmail)
 	if err != nil {
-		c.Status(400)
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 

@@ -3,6 +3,7 @@ package services
 import (
 	"Gin-gorm/db"
 	"Gin-gorm/models"
+	"Gin-gorm/structs"
 	"Gin-gorm/utils"
 	"errors"
 	"fmt"
@@ -30,20 +31,29 @@ func CreateEntry(email, title, content string) (err error) {
 	return
 }
 
-func GetEntry(email, title string) (entry models.UserEntry, err error) {
-	entry, err = db.GetEntry(email, title)
+func GetEntry(email, title string) (entry structs.GetEntryResp, err error) {
+	entryModel, err := db.GetEntry(email, title)
 	if err != nil {
 		fmt.Println("Error in GetEntry:", err.Error())
 		return
 	}
+	entry.Content = entryModel.Content
+	entry.Title = entryModel.Title
 	return
 }
 
-func GetAllEntriesFromUser(email string) (entries []models.UserEntry, err error) {
-	entries, err = db.GetAllEntriesFromUser(email)
+func GetAllEntriesFromUser(email string) (entries []structs.GetEntryResp, err error) {
+	entriesModel, err := db.GetAllEntriesFromUser(email)
 	if err != nil {
 		fmt.Println("Error in GetAllUsers:", err.Error())
 		return
+	}
+
+	for i := range entriesModel {
+		var entry structs.GetEntryResp
+		entry.Title = entriesModel[i].Title
+		entry.Content = entriesModel[i].Title
+		entries = append(entries, entry)
 	}
 	return
 }

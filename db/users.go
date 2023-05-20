@@ -3,7 +3,6 @@ package db
 import (
 	"Gin-gorm/initializers"
 	"Gin-gorm/models"
-	"Gin-gorm/structs"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -15,6 +14,7 @@ func UserExists(email string) (exists bool, err error) {
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			err = nil
 			exists = false
 			return
 		}
@@ -31,17 +31,17 @@ func CreateUser(newUser models.User) (err error) {
 }
 
 func GetUser(email string) (user models.User, err error) {
-	result := initializers.DB.Where("email = ?", email).Find(&user)
+	result := initializers.DB.Where("email = ?", email).First(&user)
 	err = result.Error
 
-	if result.RowsAffected == 0 {
+	if err == gorm.ErrRecordNotFound {
 		err = fmt.Errorf("user does not exist")
 		return
 	}
 	return
 }
 
-func GetAllUsers() (users []structs.GetUserResp, err error) {
+func GetAllUsers() (users []models.User, err error) {
 	result := initializers.DB.Find(&users)
 	err = result.Error
 	return
