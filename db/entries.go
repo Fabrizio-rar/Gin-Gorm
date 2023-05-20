@@ -31,6 +31,7 @@ func CreateEntry(newEntry models.UserEntry) (err error) {
 
 func GetEntry(email, title string) (entry models.UserEntry, err error) {
 	result := initializers.DB.Where("email = ? AND title = ?", email, title).Find(&entry)
+	err = result.Error
 
 	if result.RowsAffected == 0 {
 		err = fmt.Errorf("entry does not exist")
@@ -42,5 +43,25 @@ func GetEntry(email, title string) (entry models.UserEntry, err error) {
 func GetAllEntriesFromUser(email string) (entries []models.UserEntry, err error) {
 	result := initializers.DB.Where("email = ?", email).Find(&entries)
 	err = result.Error
+	return
+}
+
+func UpdateEntry(email, title, content string) (err error) {
+	result := initializers.DB.Exec("UPDATE user_entries SET content = ? WHERE email = ? AND title = ?", content, email, title)
+	err = result.Error
+
+	if result.RowsAffected == 0 {
+		err = fmt.Errorf("entry does not exist")
+	}
+	return
+}
+
+func DeleteEntry(email, title string) (err error) {
+	result := initializers.DB.Where("title = ? AND email = ?", title, email).Delete(&models.UserEntry{})
+	err = result.Error
+
+	if result.RowsAffected == 0 {
+		err = fmt.Errorf("entry does not exist")
+	}
 	return
 }

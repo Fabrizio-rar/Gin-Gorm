@@ -32,6 +32,7 @@ func CreateUser(newUser models.User) (err error) {
 
 func GetUser(email string) (user models.User, err error) {
 	result := initializers.DB.Where("email = ?", email).Find(&user)
+	err = result.Error
 
 	if result.RowsAffected == 0 {
 		err = fmt.Errorf("user does not exist")

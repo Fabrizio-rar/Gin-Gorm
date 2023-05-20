@@ -3,6 +3,7 @@ package services
 import (
 	"Gin-gorm/db"
 	"Gin-gorm/models"
+	"Gin-gorm/utils"
 	"errors"
 	"fmt"
 )
@@ -44,5 +45,51 @@ func GetAllEntriesFromUser(email string) (entries []models.UserEntry, err error)
 		fmt.Println("Error in GetAllUsers:", err.Error())
 		return
 	}
+	return
+}
+
+func UpdateEntry(email, password, title, content string) (err error) {
+	user, err := GetUser(email)
+	if err != nil {
+		fmt.Println("Error in GetUser:", err.Error())
+		return
+	}
+
+	credentialsValid := utils.PasswordValid(user.Password, password)
+
+	if credentialsValid {
+		err = db.UpdateEntry(email, title, content)
+		if err != nil {
+			fmt.Println("Error in UpdateEntry:", err.Error())
+			return
+		}
+	} else {
+		err = errors.New("invalid email password combination")
+		return
+	}
+
+	return
+}
+
+func DeleteEntry(email, password, title string) (err error) {
+	user, err := GetUser(email)
+	if err != nil {
+		fmt.Println("Error in GetUser:", err.Error())
+		return
+	}
+
+	credentialsValid := utils.PasswordValid(user.Password, password)
+
+	if credentialsValid {
+		err = db.DeleteEntry(email, title)
+		if err != nil {
+			fmt.Println("Error in DeleteEntry:", err.Error())
+			return
+		}
+	} else {
+		err = errors.New("invalid email password combination")
+		return
+	}
+
 	return
 }
